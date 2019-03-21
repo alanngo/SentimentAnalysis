@@ -1,71 +1,13 @@
 import java.io.*;
 import java.util.*;
 
-
 public class SentimentAnalysisApp 
 {
-	public static HashSet<String> readFile(File f) throws FileNotFoundException //reads single file
-	{
-		Scanner s = new Scanner(f);
-		HashSet<String> words = new HashSet<String>();
-		while (s.hasNext())
-		{
-			words.add(s.next().toLowerCase());
-		}
-		s.close();
-		return words;
-	}
-	public static int rateMovie(File f, HashSet<String> neg, HashSet<String>pos) throws FileNotFoundException // predicts movie rating based on words
-	{
-		HashSet<String> words = readFile(f);
-		int rating = 0;
-		for (String word: words)
-		{
-			if (neg.contains(word))
-			{
-				rating --;
-			}
-			if (pos.contains(word))
-			{
-				rating++;
-			}
-		}
-		return rating; //
-	}
+	//global constants
 	
-	public static void predicted(String x)
-	{
-		System.out.println("predicted: "+x);
-	}
-	public static void actual(String x)
-	{
-		System.out.println("actual: "+x);
-	}
-	public static void printPredictedRating(File f, HashSet<String> neg, HashSet<String>pos) throws FileNotFoundException
-	{
-		int rating = rateMovie(f, neg, pos);
-		if (rating>0)
-		{
-			predicted("positive "+rating);
-		}
-		else 
-		{
-			predicted("negative "+ rating);
-		}
-	}
-	public static void printFinal(File[] f,HashSet<String> neg, HashSet<String>pos, String actualRating) throws FileNotFoundException
-	{
-		for (int i =0; i<f.length; i++)
-    	{
-    		System.out.println(f[i].getPath());
-    		printPredictedRating(f[i], neg, pos);
-    		actual(actualRating);
-    		System.out.println();
-    	}
-	}
+	static Scanner in = new Scanner(System.in);
 	
-    
-	public static void main(String[] args) throws IOException 
+	public static void assignment1(String [] args) throws FileNotFoundException
     {
 		/* 
 		windows directories used for testing
@@ -78,7 +20,7 @@ public class SentimentAnalysisApp
     	File posWordsLinux = new File("/mnt/d/Java Workspace/SentimentAnalysis/Data/negative-words.txt");
     	*/
 
-    	
+    	Assignment1 a = new Assignment1();
     	//terminal args
     	File posWords = new File(args[0]);
     	File negWords = new File(args[1]);
@@ -86,17 +28,65 @@ public class SentimentAnalysisApp
     	File negFolderPath = new File(args[3]);
     	
     	//word sets
-    	HashSet<String> negWordSet = readFile(negWords);
-    	HashSet<String> posWordSet = readFile(posWords);
+    	HashSet<String> negWordSet = a.readFile(negWords);
+    	HashSet<String> posWordSet = a.readFile(posWords);
     	
     	//array of file reviews
     	File[] posList = posFolderPath.listFiles();
     	File[] negList = negFolderPath.listFiles();
     	
-    	printFinal(posList, negWordSet, posWordSet, "positive");//prints all in positive folder
-    	printFinal(negList, negWordSet, posWordSet, "negative");//prints all in negative folder
+    	a.printFinal(posList, negWordSet, posWordSet, "positive");//prints all in positive folder
+    	a.printFinal(negList, negWordSet, posWordSet, "negative");//prints all in negative folder
+    }
+    public static void assignment2(String []args) throws IOException
+    {
+    	Assignment2 a = new Assignment2();
     	
+    	ReviewHandler rv = new ReviewHandler();
+    	char again ='y';
+    	int choice = 0;
     	
+    	while (again=='y')
+    	{
+    		a.menu();
+    		choice = in.nextInt();
+    		//in.reset();
+    		switch (choice)
+    		{
+	    		case 0: //exit
+	    			System.exit(0);
+	    		case 1://load review 
+	    			a.loadReview(rv);
+	    			rv.saveSerialDB();
+	    			break;
+	    		case 2:// delete movie review
+	    			a.deleteReview(rv);
+	    			rv.saveSerialDB();
+	    			break;
+	    		case 3: //search by id
+	    			a.searchByID(rv);
+	    			break;
+	    		case 4://search by substring
+	    			a.searchBySubString(rv);
+	    			break;
+	    		default://save database
+	    			rv.saveSerialDB();
+	    			break;
+    		}	
+    	}  	
+    }
+    
+    public static void main(String[] args)  
+    {
+    	try
+    	{
+    		assignment2(args);
+    	}
+    	catch (Exception e)
+    	{
+    		System.out.println("YA DUN GOOFED");
+    		//e.printStackTrace();
+    	}
     }
 }
 
